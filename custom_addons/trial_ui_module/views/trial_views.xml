@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- List View -->
+    <record id="view_trial_model_list" model="ir.ui.view">
+        <field name="name">trial.model.list</field>
+        <field name="model">trial.model</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="description"/>
+            </list>
+        </field>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_trial_model_form" model="ir.ui.view">
+        <field name="name">trial.model.form</field>
+        <field name="model">trial.model</field>
+        <field name="arch" type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <field name="name"/>
+                        <field name="description"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- Action -->
+    <record id="action_trial_model" model="ir.actions.act_window">
+        <field name="name">Trial Records</field>
+        <field name="res_model">trial.model</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <!-- Menu -->
+    <menuitem id="menu_trial_root"
+              name="Trial App"
+              sequence="10"/>
+
+    <menuitem id="menu_trial_model"
+              name="Trial Records"
+              parent="menu_trial_root"
+              action="action_trial_model"
+              sequence="1"/>
+
+</odoo>

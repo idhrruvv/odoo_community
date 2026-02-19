@@ -1,0 +1,15 @@
+<odoo>
+    <record id="view_estate_property_form_inherit" model="ir.ui.view">
+        <field name="name">estate.property.form.inherit</field>
+        <field name="model">estate.property</field>
+        <field name="inherit_id" ref="dhruva_develop.view_estate_property_form"/>
+        <field name="arch" type="xml">
+
+             <!-- Expected Price ke baad commission add karenge -->
+            <xpath expr="//field[@name='expected_price']" position="after">
+                <!-- <field name="commission"/> -->
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

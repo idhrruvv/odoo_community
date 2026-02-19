@@ -1,0 +1,227 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- LIST VIEW -->
+    <record id="view_estate_property_list" model="ir.ui.view">
+        <field name="name">estate.property.list</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <list decoration-success="state == 'sold'"
+                decoration-danger="state == 'cancelled'"
+                decoration-warning="state == 'accept'">
+                <field name="name" />
+                <field name="property_type_id" />
+                <field name="seller_id" />
+                <field name="expected_price" />
+                <field name="selling_price" />
+                <field name="state" />
+                <field name="final_amount" readonly="1" />
+            </list>
+        </field>
+    </record>
+
+    <!-- FORM VIEW -->
+    <record id="view_estate_property_form" model="ir.ui.view">
+        <field name="name">estate.property.form</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+
+                    <button name="action_accept"
+                        string="Mark as Sold"
+                        type="object"
+                        class="btn-primary"
+                        invisible="state != 'accept'" />
+
+                    <button name="action_cancelled"
+                        string="Cancelled"
+                        type="object"
+                        class="btn-secondary"
+                        invisible="state == 'sold'" />
+
+                    <field name="state" widget="statusbar" />
+                </header>
+
+                <sheet>
+
+                    <!-- SMART BUTTON (Odoo 17/19 Correct)-->
+                    <div class="oe_button_box" name="button_box">
+                        <button
+                            name="action_view_offers"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-tag"
+                            invisible="not id"
+                        >
+                            <field name="offer_count" widget="statinfo" />
+                        </button>
+
+                    </div>
+
+                    <group>
+                        <group>
+                            <field name="name" />
+                            <field name="property_type_id" />
+                            <field name="postcode" />
+                            <field name="seller_id" />
+                            <field name="buyer_id" />
+                            <field name="total_area" readonly="1" />
+
+                        </group>
+                        <group>
+                            <field name="expected_price" />
+                            <field name="selling_price" />
+                            <field name="date_available" string="Available From" />
+                            <field name="tag_ids" widget="many2many_tags" />
+                            <field name="state" />
+                            <field name="commission_percentage" />
+
+
+                        </group>
+                    </group>
+
+                    <notebook>
+                        <page string="Description">
+
+                            <group name="name" string="string" col="2">
+
+                                <group>
+
+                                    <field name="bedrooms" string="Bedrooms" />
+                                    <field name="living_area" />
+                                    <field name="garden" />
+
+                                    <field name="garden_area"
+                                        invisible="not garden"
+                                        readonly="not garden"
+                                        required="garden" />
+
+                                    <field name="description" />
+                                </group>
+
+                                <group>
+                                    <field name="accepted_offer_price" readonly="1" />
+                                    <field name="commission_amount" readonly="1" />
+                                    <field name="final_amount" readonly="1" />
+                                </group>
+                            </group>
+
+                        </page>
+
+                        <page string="Offers">
+                            <field name="offers">
+                                <list editable="bottom" />
+                            </field>
+                        </page>
+
+                    </notebook>
+
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <!-- SEARCH VIEW -->
+    <record id="view_estate_property_search" model="ir.ui.view">
+        <field name="name">estate.property.search</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" />
+                <field name="property_type_id" />
+                <field name="seller_id" />
+
+                <filter string="New"
+                    name="filter_new"
+                    domain="[('state','=','new')]" />
+
+                <filter string="Sold"
+                    name="filter_sold"
+                    domain="[('state','=','sold')]" />
+            </search>
+        </field>
+    </record>
+
+    <!-- KANBAN VIEW -->
+    <record id="view_estate_property_kanban" model="ir.ui.view">
+        <field name="name">estate.property.kanban</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <kanban default_group_by="state">
+                <field name="name" />
+                <field name="expected_price" />
+                <field name="selling_price" />
+                <field name="state" />
+                <field name="seller_id" />
+                <field name="buyer_id" />
+
+                <!-- THIS MAKES FIXED COLUMNS -->
+                <progressbar field="state" colors='{"new":"secondary","accept":"secondary","sold":"secondary","cancelled":"secondary"}'/>
+
+                <templates>
+                    <t t-name="card">
+                        <div class="oe_kanban_card p-1">
+
+                            <div class="fw-bold fs-5">
+                                <field name="name"/>
+                            </div>
+<!-- 
+                            <div>
+                                <strong>Expected:</strong>
+                                <field name="expected_price" />
+                            </div>
+
+                            <div t-if="record.selling_price.raw_value">
+                                <strong>Selling:</strong>
+                                <field name="selling_price" />
+                            </div> -->
+
+                            <div class="mt-2">
+                                <strong>Seller:</strong>
+                                <field name="seller_id" />
+                            </div>
+
+                            <div t-if="record.buyer_id.raw_value">
+                                <strong>Buyer:</strong>
+                                <field name="buyer_id" />
+                            </div>
+
+                            <div class="mt-2">
+                                <span t-if="record.state.raw_value == 'new'"
+                                    class="badge text-dark">New</span>
+
+                                <span t-if="record.state.raw_value == 'accept'"
+                                    class="badge text-warning">Accepted</span>
+
+                                <span t-if="record.state.raw_value == 'sold'"
+                                    class="badge text-success">Sold</span>
+
+                                <span t-if="record.state.raw_value == 'cancelled'"
+                                    class="badge text-danger">Cancelled</span>
+                            </div>
+
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+
+    <!-- ACTION -->
+    <record id="action_estate_property" model="ir.actions.act_window">
+        <field name="name">Properties</field>
+        <field name="res_model">estate.property</field>
+        <field name="view_mode">kanban,list,form</field>
+    </record>
+
+    <!-- MENU -->
+    <menuitem id="menu_estate_root" name="Estate" />
+
+    <menuitem id="menu_estate_property"
+        name="Properties"
+        parent="menu_estate_root"
+        action="action_estate_property" />
+
+</odoo>
